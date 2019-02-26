@@ -53,13 +53,6 @@ module.exports = function(grunt) {
 
   grunt.initConfig({
     pkg: grunt.file.readJSON("package.json"),
-    "bower-install-simple": {
-      all: {
-        options: {
-          production: false
-        }
-      }
-    },
     compress: {
       all: {
         options: {
@@ -77,7 +70,7 @@ module.exports = function(grunt) {
     connect: {
       server: {
         options: {
-          base: "",
+          base: '',
           port: testPort
         }
       }
@@ -131,10 +124,8 @@ module.exports = function(grunt) {
       all: {
         options: {
           urls: [testBaseURL + testFile, testBaseURL + testFileMin],
-          build: process.env.TRAVIS_JOB_NUMBER || "unknown",
           browsers: browsers,
           statusCheckAttempts: -1,
-          tags: [process.env.TRAVIS_BRANCH || "unknown"],
           throttled: 6
         }
       }
@@ -151,7 +142,6 @@ module.exports = function(grunt) {
     }
   });
 
-  grunt.loadNpmTasks("grunt-bower-install-simple");
   grunt.loadNpmTasks("grunt-contrib-compress");
   grunt.loadNpmTasks("grunt-contrib-connect");
   grunt.loadNpmTasks("grunt-contrib-jshint");
@@ -162,7 +152,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks("grunt-saucelabs");
 
   grunt.registerTask("default", ["test"]);
-  grunt.registerTask("test", ["bower-install-simple", "qunit:src", "jshint"]);
-  grunt.registerTask("test-min", ["bower-install-simple", "uglify", "qunit:min"]);
+  grunt.registerTask("test", ["qunit:src", "jshint"]);
+  grunt.registerTask("test-min", ["uglify", "qunit:min"]);
   grunt.registerTask("ci", ["test", "coveralls", "test-min", "connect", "saucelabs-qunit", "compress"]);
 };

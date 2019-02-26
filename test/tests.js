@@ -5,7 +5,7 @@ var testcases = function(undefined) {
     for (var i = 0; i < data.length; ++i) {
       uintArray[i] = data[i];
     }
-    return new Uint8Array(data);  
+    return new Uint8Array(data);
   }
 
   return [
@@ -384,17 +384,17 @@ var testcases = function(undefined) {
     ] ];
 }();
 
-function myDeepEqual(actual, expected, text) {
+function myDeepEqual(actual, expected, text, assert) {
   if (actual instanceof Uint8Array && expected instanceof Uint8Array) {
     var bufferMatch = actual.length === expected.length;
     for (var i = 0; i < actual.length; ++i) {
       bufferMatch = bufferMatch && actual[i] === expected[i];
     }
     if (bufferMatch)
-      return ok(true, text);
+      return assert.ok(true, text);
   }
 
-  return deepEqual(actual, expected, text);
+  return assert.deepEqual(actual, expected, text);
 }
 
 function hex2arrayBuffer(data) {
@@ -412,28 +412,35 @@ testcases.forEach(function(testcase) {
   var expected = testcase[2];
   var binaryDifference = testcase[3];
 
-  test(name, function() {
-    myDeepEqual(CBOR.decode(hex2arrayBuffer(data)), expected, "Decoding");
+  QUnit.test(name, function(assert) {
+    myDeepEqual(CBOR.decode(hex2arrayBuffer(data)), expected, "Decoding", assert);
     var encoded = CBOR.encode(expected);
-    myDeepEqual(CBOR.decode(encoded), expected, "Encoding (deepEqual)");
+    myDeepEqual(CBOR.decode(encoded), expected, "Encoding (assert.deepEqual)", assert);
     if (!binaryDifference) {
       var hex = "";
       var uint8Array = new Uint8Array(encoded);
       for (var i = 0; i < uint8Array.length; ++i)
         hex += (uint8Array[i] < 0x10 ? "0" : "") + uint8Array[i].toString(16);
-      equal(hex, data, "Encoding (byteMatch)");
+      assert.equal(hex, data, "Encoding (byteMatch)");
     }
   });
 });
 
-test("Big Array", function() {
+QUnit.test("Big Array", function(assert) {
   var value = new Array(0x10001);
   for (var i = 0; i < value.length; ++i)
     value[i] = i;
-  deepEqual(CBOR.decode(CBOR.encode(value)), value, 'deepEqual')
+  assert.deepEqual(CBOR.decode(CBOR.encode(value)), value, 'assert.deepEqual')
 });
 
-test("Remaining Bytes", function() {
+QUnit.test("Big String", function(assert) {
+  var value = ''
+  for (var i = 0; i < 150000; ++i)
+    value += Math.floor(i % 10).toString()
+  assert.deepEqual(CBOR.decode(CBOR.encode(value)), value, 'assert.deepEqual')
+});
+
+QUnit.test("Remaining Bytes", function(assert) {
   var threw = false;
   try {
     var arrayBuffer = new ArrayBuffer(2);
@@ -442,10 +449,10 @@ test("Remaining Bytes", function() {
     threw = e;
   }
 
-  ok(threw, "Thrown exception");
+  assert.ok(threw, "Thrown exception");
 });
 
-test("Invalid length encoding", function() {
+QUnit.test("Invalid length encoding", function(assert) {
   var threw = false;
   try {
     CBOR.decode(hex2arrayBuffer("1e"))
@@ -453,10 +460,10 @@ test("Invalid length encoding", function() {
     threw = e;
   }
 
-  ok(threw, "Thrown exception");
+  assert.ok(threw, "Thrown exception");
 });
 
-test("Invalid length", function() {
+QUnit.test("Invalid length", function(assert) {
   var threw = false;
   try {
     CBOR.decode(hex2arrayBuffer("1f"))
@@ -464,10 +471,10 @@ test("Invalid length", function() {
     threw = e;
   }
 
-  ok(threw, "Thrown exception");
+  assert.ok(threw, "Thrown exception");
 });
 
-test("Invalid indefinite length element type", function() {
+QUnit.test("Invalid indefinite length element type", function(assert) {
   var threw = false;
   try {
     CBOR.decode(hex2arrayBuffer("5f00"))
@@ -475,10 +482,10 @@ test("Invalid indefinite length element type", function() {
     threw = e;
   }
 
-  ok(threw, "Thrown exception");
+  assert.ok(threw, "Thrown exception");
 });
 
-test("Invalid indefinite length element length", function() {
+QUnit.test("Invalid indefinite length element length", function(assert) {
   var threw = false;
   try {
     CBOR.decode(hex2arrayBuffer("5f5f"))
@@ -486,10 +493,10 @@ test("Invalid indefinite length element length", function() {
     threw = e;
   }
 
-  ok(threw, "Thrown exception");
+  assert.ok(threw, "Thrown exception");
 });
 
-test("Tagging", function() {
+QUnit.test("Tagging", function(assert) {
   function TaggedValue(value, tag) {
     this.value = value;
     this.tag = tag;
@@ -505,12 +512,12 @@ test("Tagging", function() {
     return new SimpleValue(value);
   });
   
-  ok(decoded[0] instanceof TaggedValue, "first item is a TaggedValue");
-  equal(decoded[0].value, 3, "first item value");
-  equal(decoded[0].tag, 0x12, "first item tag");
-  ok(decoded[1] instanceof TaggedValue, "second item is a TaggedValue");
-  equal(decoded[1].value, 8, "second item value");
-  equal(decoded[1].tag, 0x4567, "second item tag");
-  ok(decoded[2] instanceof SimpleValue, "third item is a SimpleValue");
-  equal(decoded[2].value, 0xf0, "third item tag");
+  assert.ok(decoded[0] instanceof TaggedValue, "first item is a TaggedValue");
+  assert.equal(decoded[0].value, 3, "first item value");
+  assert.equal(decoded[0].tag, 0x12, "first item tag");
+  assert.ok(decoded[1] instanceof TaggedValue, "second item is a TaggedValue");
+  assert.equal(decoded[1].value, 8, "second item value");
+  assert.equal(decoded[1].tag, 0x4567, "second item tag");
+  assert.ok(decoded[2] instanceof SimpleValue, "third item is a SimpleValue");
+  assert.equal(decoded[2].value, 0xf0, "third item tag");
 });

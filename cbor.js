@@ -23,13 +23,15 @@
  */
 
 (function(global, undefined) { "use strict";
-var POW_2_24 = 5.960464477539063e-8,
-    POW_2_32 = 4294967296,
-    POW_2_53 = 9007199254740992;
+const POW_2_24 = 5.960464477539063e-8;
+const POW_2_32 = 4294967296;
+const POW_2_53 = 9007199254740992;
+const DECODE_CHUNK_SIZE = 8192;
 
 function encode(value) {
   var data = new ArrayBuffer(256);
   var dataView = new DataView(data);
+  var byteView = new Uint8Array(data);
   var lastLength;
   var offset = 0;
 
@@ -42,6 +44,7 @@ function encode(value) {
       var oldDataView = dataView;
       data = new ArrayBuffer(newByteLength);
       dataView = new DataView(data);
+      byteView = new Uint8Array(data);
       var uint32count = (offset + 3) >> 2;
       for (var i = 0; i < uint32count; ++i)
         dataView.setUint32(i << 2, oldDataView.getUint32(i << 2));
@@ -60,9 +63,8 @@ function encode(value) {
     commitWrite(prepareWrite(1).setUint8(offset, value));
   }
   function writeUint8Array(value) {
-    var dataView = prepareWrite(value.length);
-    for (var i = 0; i < value.length; ++i)
-      dataView.setUint8(offset + i, value[i]);
+    prepareWrite(value.length);
+    byteView.set(value, offset);
     commitWrite();
   }
   function writeUint16(value) {
@@ -350,7 +352,14 @@ function decode(data, tagger, simpleValue) {
             appendUtf16Data(utf16data, length);
         } else
           appendUtf16Data(utf16data, length);
-        return String.fromCharCode.apply(null, utf16data);
+        var string = "";
+        for (i = 0; i < utf16data.length; i += DECODE_CHUNK_SIZE) {
+          string += String.fromCharCode.apply(
+            null,
+            utf16data.slice(i, i + DECODE_CHUNK_SIZE)
+          );
+        }
+        return string;
       case 4:
         var retArray;
         if (length < 0) {

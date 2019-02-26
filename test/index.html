@@ -3,14 +3,13 @@
 <head>
   <meta charset="utf-8">
   <title>QUnit Tests</title>
-  <link rel="stylesheet" href="../bower_components/qunit/qunit/qunit.css">
+  <link rel="stylesheet" href="../node_modules/qunit/qunit/qunit.css">
+  <script src="../cbor.js"></script>
 </head>
 <body>
   <div id="qunit"></div>
   <div id="qunit-fixture"></div>
-  <script src="../bower_components/qunit/qunit/qunit.js"></script>
-  <script src="../cbor.js"></script>
-  <script src="../cbor.js"></script>
+  <script src="../node_modules/qunit/qunit/qunit.js"></script>
   <script>
     function define(id, obj) {
       if (!arguments.callee.amd)
@@ -20,12 +19,8 @@
       if (!("decode" in obj && "encode" in obj))
         throw "Unecpected object";
     }
-  </script>
-  <script src="../cbor.js"></script>
-  <script>
     define.amd = {};
   </script>
-  <script src="../cbor.js"></script>
   <script src="./tests.js"></script>
   <script>
     QUnit.done(function(results){
