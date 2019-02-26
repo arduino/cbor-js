@@ -28,7 +28,7 @@ const POW_2_32 = 4294967296;
 const POW_2_53 = 9007199254740992;
 const DECODE_CHUNK_SIZE = 8192;
 
-function encode(value) {
+function encode(value, numericKeys) {
   var data = new ArrayBuffer(256);
   var dataView = new DataView(data);
   var byteView = new Uint8Array(data);
@@ -166,6 +166,9 @@ function encode(value) {
           writeTypeAndLength(5, length);
           for (i = 0; i < length; ++i) {
             var key = keys[i];
+            if (numericKeys) {
+              key = parseInt(key);
+            }
             encodeItem(key);
             encodeItem(value[key]);
           }
