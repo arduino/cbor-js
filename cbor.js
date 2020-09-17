@@ -131,7 +131,7 @@ function encode(value, numericKeys) {
           } else if (charCode < 0x800) {
             utf8data.push(0xc0 | charCode >> 6);
             utf8data.push(0x80 | charCode & 0x3f);
-          } else if (charCode < 0xd800) {
+          } else if (charCode < 0xd800 || charCode >= 0xe000) {
             utf8data.push(0xe0 | charCode >> 12);
             utf8data.push(0x80 | (charCode >> 6)  & 0x3f);
             utf8data.push(0x80 | charCode & 0x3f);
