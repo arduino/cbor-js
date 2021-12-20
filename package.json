@@ -1,11 +1,11 @@
 {
-  "name": "@arduino/cbor-js",
+  "name": "@cobrowseio/cbor-js",
   "version": "0.1.2",
   "description": "The Concise Binary Object Representation (CBOR) data format (RFC7049) implemented in pure JavaScript.",
   "keywords": [
     "cbor"
   ],
-  "homepage": "https://github.com/arduino/cbor-js",
+  "homepage": "https://github.com/cobrowseio/cbor-js",
   "bugs": "https://github.com/arduino/cbor-js/issues",
   "license": "MIT",
   "author": "Patrick Gansterer <paroga@paroga.com> (http://paroga.com/)",
@@ -13,13 +13,14 @@
   "files": [
     "cbor.js"
   ],
-  "repository": {
-    "type": "git",
-    "url": "http://github.com/arduino/cbor-js.git"
+  "repository": "git://github.com/cobrowseio/cbor-js",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
   },
   "scripts": {
-    "test": "grunt test",
-    "ci": "grunt ci"
+    "ci": "grunt ci",
+    "release": "release-it",
+    "test": "grunt test"
   },
   "devDependencies": {
     "grunt": "^1.0.3",
@@ -32,6 +33,7 @@
     "grunt-coveralls": "^2.0.0",
     "grunt-qunit-istanbul": "^1.0.0",
     "grunt-saucelabs": "^9.0.1",
-    "qunit": "2.9.2"
+    "qunit": "2.9.2",
+    "release-it": "^14.11.8"
   }
 }
